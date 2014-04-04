@@ -83,7 +83,7 @@ Emitter.prototype.encodeGearmanBody = function (packet) {
         if (! packet.type.args.length) {
             return new Buffer(0);
         }
-        var arg = packet.type.args[packet.type.args.length];
+        var arg = packet.type.args[packet.type.args.length-1];
         var bodyvalue = (packet.args && packet.args[arg]!=null) ? packet.args[arg] : '';
         return new Buffer(bodyvalue);
     }
