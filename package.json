@@ -1,0 +1,21 @@
+{
+  "name": "gearman-packet",
+  "description": "A streaming gearman parser / emitter suitable for building libraries or servers from",
+  "version": "0.1.0",
+  "dependencies": { },
+  "main": "gearman-packet.js",
+  "license": "BSD",
+  "scripts": {
+    "test": "node node_modules/tape/bin/tape $(find test -name '*.js')"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/iarna/gearman-packet.git"
+  },
+  "devDependencies": {
+    "tape": "~1.0.4"
+  },
+  "directories": {
+    "test": "test"
+  }
+}
