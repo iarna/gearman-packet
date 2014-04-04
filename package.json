@@ -14,8 +14,9 @@
   },
   "devDependencies": {
     "tape": "~1.0.4",
-    "streamify": "*",
-    "through2": "*"
+    "buffer-equal": "~0.0.0",
+    "streamify": "~0.2.3",
+    "through2": "~0.4.1"
   },
   "directories": {
     "test": "test"
