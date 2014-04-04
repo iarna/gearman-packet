@@ -1,5 +1,6 @@
 gearman-packet
 --------------
+[![Build Status](https://travis-ci.org/iarna/gearman-packet.svg?branch=master)](https://travis-ci.org/iarna/gearman-packet)
 
 A streaming packet parser and emitter for the Gearman protocol and Node.js. 
 
