@@ -33,7 +33,6 @@ Emitter.prototype.encodeAdmin = function (packet,done) {
     done();
 }
 
-
 Emitter.prototype.encodeGearman = function (packet,done) {
     var args = this.encodeGearmanArgs(packet);
     var body = this.encodeGearmanBody(packet);
