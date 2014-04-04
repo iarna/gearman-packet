@@ -1,7 +1,7 @@
 {
   "name": "gearman-packet",
   "description": "A streaming gearman parser / emitter suitable for building libraries or servers from",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "dependencies": {},
   "main": "gearman-packet.js",
   "license": "BSD",
