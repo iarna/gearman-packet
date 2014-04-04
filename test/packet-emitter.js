@@ -2,6 +2,13 @@
 var test = require('tape');
 var GearmanPacket = require('../gearman-packet.js');
 
+var bufferEqual = function(b1,b2) {
+    if (b1.length!=b2.length) return false;
+    for (var ii=0; ii<b1.length; ++ii) {
+        if (b1[ii]!=b2[ii]) return false;
+    }
+    return true;
+}
 
 test("constructor",function(t) {
     t.plan(1);
@@ -66,7 +73,7 @@ test("encodeAdmin",function(t) {
     emitter.push = function(buf){ pushed = buf };
     emitter.encodeAdmin({command:'test'},function(){});
     t.ok( Buffer.isBuffer(pushed), 'Encoded into a buffer' );
-    t.looseEqual( pushed, new Buffer('test\n'), 'Encoded with a newline at the end');
+    t.ok( bufferEqual(pushed, new Buffer('test\n')), 'Encoded with a newline at the end');
 });
 
 /*
