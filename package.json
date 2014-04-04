@@ -13,7 +13,9 @@
     "url": "git://github.com/iarna/gearman-packet.git"
   },
   "devDependencies": {
-    "tape": "~1.0.4"
+    "tape": "~1.0.4",
+    "streamify": "*",
+    "through2": "*"
   },
   "directories": {
     "test": "test"
