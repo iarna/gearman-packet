@@ -414,8 +414,8 @@ test("bodystream",function (t) {
     var lastData = null;
     var dataComplete = false;
     var body = {
-        push: function(){ dataComplete=true },
-        write: function(chunk,done) { lastData = chunk; if (done) done() }
+        end: function(){ dataComplete=true },
+        write: function(chunk,done) { lastData = chunk; if (done) done() },
     }
 
     reset([0,0,0]);

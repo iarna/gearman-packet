@@ -1,7 +1,6 @@
 "use strict";
 var stream = require('stream');
 var util = require('util');
-var PushStream = require('./push-stream');
 var Packet = require('./packet-types');
 
 var Parser = module.exports = function (options) {
@@ -211,7 +210,7 @@ Parser.prototype.body = function () {
         return this.bodystring;
     }
     else if (this.packet.type.body == 'stream') {
-        this.packet.body = new PushStream();
+        this.packet.body = new stream.PassThrough();
         this.bodyRead = 0;
         this.sendPacket(this.packet);
         return this.bodystream;
@@ -251,7 +250,7 @@ Parser.prototype.bodystream = function (done) {
     if (this.bodyRead + this.bytes() >= this.packet.bodySize) {
         var self = this;
         this.packet.body.write( this.readBuffer(this.packet.bodySize-this.bodyRead), function(){
-            self.packet.body.push(null);
+            self.packet.body.end();
             self.state = self.endPacket();
             self.runCurrentState(done);
         });
