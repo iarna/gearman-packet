@@ -122,12 +122,16 @@ test("encodeGearmanArgs",function(t) {
 
     var buf = emitter.encodeGearmanArgs({type:{args:[],body:'buffer'}});
     bufferIs(t, buf, new Buffer(0), 'No arguments');
+
     var buf = emitter.encodeGearmanArgs({type:{args:['foo'],body:'buffer'},args:{foo:'test'}});
     bufferIs(t, buf, new Buffer('test\0'), 'One argument');
+
     var buf = emitter.encodeGearmanArgs({type:{args:['foo','bar'],body:'buffer'},args:{foo:'test',bar:'baz'}});
     bufferIs(t, buf, new Buffer('test\0baz\0'), 'Two arguments');
+
     var buf = emitter.encodeGearmanArgs({type:{args:['foo','bar']},args:{foo:'test',bar:'baz'}});
     bufferIs(t, buf, new Buffer('test\0'), 'One arg and argbody');
+
     var buf = emitter.encodeGearmanArgs({type:{args:['foo']},args:{foo:'test'}});
     bufferIs(t, buf, new Buffer(0), 'Argbody only');
 });
@@ -138,18 +142,23 @@ test("encodeGearmanBody",function(t) {
 
     var buf = emitter.encodeGearmanBody({type:{body:'buffer'},body: new Buffer([1,2,3])});
     bufferIs(t, buf, new Buffer([1,2,3]), 'Buffer bodies pass through');
+
     var buf = emitter.encodeGearmanBody({type:{body:'buffer'},body: [1,2,3]});
     bufferIs(t, buf, new Buffer([1,2,3].toString()), 'Non-buffers are passed to toString before being turned into buffers');
 
     var buf = emitter.encodeGearmanBody({type:{body:'buffer'}});
     bufferIs(t, buf, new Buffer(0), 'Missing bodies produce empty buffers');
+
     var buf = emitter.encodeGearmanBody({type:{body:'buffer'},body: streamify([new Buffer([1,2,3])]), bodySize:3});
     t.ok( buf instanceof stream.Readable, 'Streams get passed through' );
     t.is( buf.length, 3, 'Streams get a length' );
+
     var buf = emitter.encodeGearmanBody({type:{args:[]}});
     bufferIs(t, buf, new Buffer(0), 'No body, no args, empty buffer');
+
     var buf = emitter.encodeGearmanBody({type:{args:['foo']},args:{foo:'test'}});
     bufferIs(t, buf, new Buffer('test'), 'solo argbody');
+
     var buf = emitter.encodeGearmanBody({type:{args:['foo','bar']},args:{foo:'test',bar:'baz'}});
     bufferIs(t, buf, new Buffer('baz'), 'multi argbody');
 });
