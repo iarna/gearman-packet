@@ -139,7 +139,8 @@ test("encodeGearmanBody",function(t) {
     var buf = emitter.encodeGearmanBody({type:{body:'buffer'},body: new Buffer([1,2,3])});
     bufferIs(t, buf, new Buffer([1,2,3]), 'Buffer bodies pass through');
     var buf = emitter.encodeGearmanBody({type:{body:'buffer'},body: [1,2,3]});
-    bufferIs(t, buf, new Buffer([1,2,3]), 'Non-buffers are constructed');
+    bufferIs(t, buf, new Buffer([1,2,3].toString()), 'Non-buffers are passed to toString before being turned into buffers');
+
     var buf = emitter.encodeGearmanBody({type:{body:'buffer'}});
     bufferIs(t, buf, new Buffer(0), 'Missing bodies produce empty buffers');
     var buf = emitter.encodeGearmanBody({type:{body:'buffer'},body: streamify([new Buffer([1,2,3])]), bodySize:3});

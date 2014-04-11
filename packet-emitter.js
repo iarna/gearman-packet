@@ -86,14 +86,17 @@ Emitter.prototype.encodeGearmanBody = function (packet) {
         var bodyvalue = (packet.args && packet.args[arg]!=null) ? packet.args[arg] : '';
         return new Buffer(bodyvalue);
     }
-    if (Buffer.isBuffer(packet.body)) {
+    else if (Buffer.isBuffer(packet.body)) {
         return packet.body;
     }
-    if (packet.body instanceof stream.Readable) {
-        packet.body.length = packet.bodySize;
+    else if (packet.body instanceof stream.Readable) {
+        if (typeof packet.bodySize == 'number') packet.body.length = packet.bodySize;
         return packet.body;
     }
-    if (packet.body != null) {
+    else if (packet.body != null && packet.body.toString) {
+        return new Buffer(packet.body.toString());
+    }
+    else if (packet.body != null) {
         return new Buffer(packet.body);
     }
     return new Buffer(0);
