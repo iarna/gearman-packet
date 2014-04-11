@@ -84,7 +84,7 @@ Parser.prototype.bytes = function () {
 }
 
 Parser.prototype.readBuffer = function(size) {
-    if (!size) return null;
+    if (!size) return new Buffer(0);
     if (this.buffer===null) {
         this.emit('error',new Error('Attempted to read '+size+' bytes from an empty buffer'));
         return new Buffer();
