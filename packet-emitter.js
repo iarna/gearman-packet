@@ -126,6 +126,9 @@ Emitter.prototype.encodeGearmanBody = function (packet) {
     }
     else if (packet.body instanceof stream.Readable) {
         if (typeof packet.bodySize == 'number') packet.body.length = packet.bodySize;
+        if (packet.body.length == null) {
+            throw new TypeError("Streamable gearman packet bodies MUST either have a bodySize passed in with them or a length attribute "+util.inspect(packet));
+        }
         return packet.body;
     }
     else {
