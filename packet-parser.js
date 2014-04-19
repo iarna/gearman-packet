@@ -211,6 +211,7 @@ Parser.prototype.body = function () {
     }
     else if (this.packet.type.body == 'stream') {
         this.packet.body = new stream.PassThrough();
+        this.packet.body.length = this.packet.bodySize;
         this.bodyRead = 0;
         this.sendPacket(this.packet);
         return this.bodystream;
