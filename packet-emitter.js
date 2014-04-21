@@ -121,8 +121,7 @@ Emitter.prototype.encodeGearmanBody = function (packet) {
             return new Buffer(0);
         }
         var arg = packet.type.args[packet.type.args.length-1];
-        var bodyvalue = this.toBuffer(packet.args ? packet.args[arg] : null);
-        return new Buffer(bodyvalue);
+        return this.toBuffer(packet.args ? packet.args[arg] : new Buffer(0));
     }
     else if (packet.body instanceof stream.Readable) {
         if (typeof packet.bodySize == 'number') packet.body.length = packet.bodySize;
