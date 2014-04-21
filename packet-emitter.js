@@ -106,10 +106,10 @@ Emitter.prototype.encodeGearmanArgs = function (packet) {
     for (var ii = 0; ii<argcount; ++ii) {
         var arg = packet.type.args[ii];
         var argvalue = this.toBuffer( packet.args ? packet.args[arg] : null );
-        args[ii] = Buffer.concat([ argvalue, new Buffer([0]) ], argvalue.length+1);
-        if (args[ii].length > 65) {
-            throw new TypeError("Gearman packet "+packet.type.name+" argument #"+ii+" ("+packet.type.args[ii]+") was "+args[ii].length+" bytes long, but arguments are limited to 64 bytes");
+        if (argvalue.length > 64) {
+            throw new TypeError("Gearman packet "+packet.type.name+" argument #"+ii+" ("+packet.type.argvalue+") was "+argvalue.length+" bytes long, but arguments are limited to 64 bytes");
         }
+        args[ii] = Buffer.concat([ argvalue, new Buffer([0]) ], argvalue.length+1);
         argsbytes += args[ii].length;
     }
     return Buffer.concat(args,argsbytes);
