@@ -30,7 +30,7 @@ Packet Objects
 
 Packet objects have the following properties:
 
-* kind: 'request'|'response'
+* kind: 'request'|'response'|'admin'
 * type: typeobject
 * args: typeargshash
 * body: buffer|string|stream
@@ -55,11 +55,3 @@ Purpose
 This is intended as low-level layer for both a new,
 streaming-from-the-ground-up gearman client/worker library and also a
 gearmand-in-node project.
-
-Unsupported
------------
-
-Admin commands are not yet fully supported:
-
-* Arguments to admin commands are not supported
-* The results of admin commands (variously formatted text) are not supported.

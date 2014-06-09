@@ -19,7 +19,7 @@ streamify([
     {kind:'response', type:GearmanPacket.types['JOB_ASSIGN'],    args:{job:'H:lap:1',function:'reverse'}, body:'test'},
     {kind:'request',  type:GearmanPacket.types['WORK_COMPLETE'], args:{job:'H:lap:1'},                      body:'tset'},
     {kind:'response', type:GearmanPacket.types['WORK_COMPLETE'], args:{job:'H:lap:1'},                      body:'tset'},
-    {kind:'admin', command: 'workers'}
+    {kind:'admin', type:GearmanPacket.adminTypes['line'], args:{line: 'workers'}}
 ])
 .pipe(new GearmanPacket.Emitter())
 .pipe(new GearmanPacket.Parser())

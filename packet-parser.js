@@ -283,22 +283,34 @@ Parser.prototype.bodystring = function () {
 
 Parser.prototype.admin = function () {
     var lfindex;
-    if (-1 != (lfindex = this.bufferIndexOf(this.offset,64,10))) {
-        var cmd = this.buffer.slice(this.offset,lfindex).toString();
-        var cmdBytes = cmd.length+1;
+    if (-1 != (lfindex = this.bufferIndexOf(this.offset,1024,10))) {
+        var cmd = this.buffer.slice(this.offset,lfindex).toString().replace(/^\s+|\s+$/g,'');
+        var cmdBytes = (lfindex - this.offset) + 1;
         this.consume(cmdBytes);
-        this.sendPacket({ kind: 'admin', command: cmd.replace(/^\s+|\s+$/g,'') })
+        var match;
+        if (match = cmd.match(/^OK(?:\s+(.*))?$/)) {
+            this.sendPacket({ kind: 'admin', type: Packet.adminTypes['ok'], args: { line: match[1] } });
+        }
+        else if (match = cmd.match(/^ERR \s+(\S+)(?:\s+(\S+))?/)) {
+            this.sendPacket({ kind: 'admin', type: Packet.adminTypes['error'], args: { code: match[1], message: match[2] } });
+        }
+        else if (cmd === '.') {
+            this.sendPacket({ kind: 'admin', type: Packet.adminTypes['block-complete'], args: {} });
+        }
+        else {
+            this.sendPacket({ kind: 'admin', type: Packet.adminTypes['line'], args: { line: cmd } });
+        }
         return this.endPacket();
     }
-    else if (this.bytes()>=64) {
-        this.emit('error',new Error('An admin command went 64 characters without a newline'));
+    else if (this.bytes()>=1024) {
+        this.emit('error',new Error('An admin command went 1024 characters without a newline'));
         return this.adminSkip;
     }
 }
 
 Parser.prototype.adminSkip = function () {
     var lfindex;
-    if (-1 != (lfindex = this.bufferIndexOf(this.offset,64,10))) {
+    if (-1 != (lfindex = this.bufferIndexOf(this.offset,1024,10))) {
         this.consume(lfindex+1);
         return this.endPacket();
     }

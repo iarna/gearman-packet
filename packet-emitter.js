@@ -29,7 +29,32 @@ Emitter.prototype._transform = function (packet, encoding, done) {
 }
 
 Emitter.prototype.encodeAdmin = function (packet,done) {
-    this.push(new Buffer(packet.command+'\n'));
+    if (!packet.args) { packet.args = {} }
+    if (packet.type.name == 'error') {
+        if (packet.args.code) {
+            this.push(new Buffer('ERR ' + packet.args.code + (packet.args.message && packet.args.message.length ? ' ' + packet.args.message : '') + '\n'));
+        }
+        else {
+            this.emit('error',new Error('Received invalid error admin packet, missing code argument'));
+        }
+    }
+    else if (packet.type.name == 'ok') {
+        this.push(new Buffer('OK' + (packet.args.line && packet.args.line.length ? ' ' + packet.args.line : '') + '\n'));
+    }
+    else if (packet.type.name == 'block-complete') {
+        this.push(new Buffer('.\n'));
+    }
+    else if (packet.type.name == 'line') {
+        if (packet.args.line) {
+            this.push(new Buffer(packet.args.line+'\n'));
+        }
+        else {
+            this.emit('error',new Error('Received invalid line admin packet, missing line argument'));
+        }
+    }
+    else {
+        this.emit('error',new Error('Received unknown type of admin packet '+packet.type.name));
+    }
     done();
 }
 

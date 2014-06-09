@@ -33,7 +33,7 @@ test("_transform",function(t) {
     var complete;
 
     complete = false; pushed = null; error = null;
-    emitter._transform({kind: 'admin'}, null, function(){ complete = true });
+    emitter._transform({kind: 'admin',type:{name:'ok'}}, null, function(){ complete = true });
     t.is( complete, true, 'admin: _transform completed' );
     t.is( error, null, 'admin: no error' );
     t.is( pushed, 'ADMIN', 'admin: routed correctly' );
@@ -76,7 +76,7 @@ test("encodeAdmin",function(t) {
     var emitter = new GearmanPacket.Emitter();
     var pushed;
     emitter.push = function(buf){ pushed = buf };
-    emitter.encodeAdmin({command:'test'},function(){});
+    emitter.encodeAdmin({args:{line:'test'},type:{name:'line'}},function(){});
     t.ok( Buffer.isBuffer(pushed), 'Encoded into a buffer' );
     bufferIs(t, pushed, new Buffer('test\n'), 'Encoded with a newline at the end');
 });

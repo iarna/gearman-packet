@@ -448,7 +448,12 @@ test("admin",function (t) {
     stateNotChanged(t, parser.admin, "no newline, so keep skipping");
     t.is(lastError, null, 'No error');
 
-    reset('something that is much too long as gearman limits args to 64 chars, including a linefeed\n');
+    var toolong = '';
+    for (var ii=0; ii<12; ++ii) {
+        toolong += 'something that is much too long, we limit admin commands to 1024 chars, including a linefeed';
+    }
+    toolong += "\n";
+    reset(toolong);
     stateChanged(t, parser.admin, parser.adminSkip, "command too long, skip the rest");
     t.notEqual(lastError, null, 'Commands that overflow our buffer should emit errors');
 
@@ -457,7 +462,7 @@ test("admin",function (t) {
     t.is(lastError, null, 'No error');
     t.is(parser.buffer.slice(parser.offset).toString(), 'def', "buffer should just be stuff after the newline");
     t.is(lastPushed?lastPushed.kind:null, 'admin', 'admin packet was pushed');
-    t.is(lastPushed?lastPushed.command:null, 'abc', 'admin command was correct');
+    t.is(lastPushed?lastPushed.args.line:null, 'abc', 'admin command was correct');
 });
 
 test("adminSkip",function (t) {

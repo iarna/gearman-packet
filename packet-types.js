@@ -1,5 +1,11 @@
 "use strict";
 var GearmanPacket = exports;
+GearmanPacket.adminTypes = {
+    'error': { args: ['code','message'] },
+    'ok': { args: ['line'] },
+    'line': { args: ['line'] },
+    'block-complete': { args: [] }
+}
 GearmanPacket.types = {
     CAN_DO: {id: 1, args: ['function']},
     CANT_DO: {id: 2, args: ['function']},
@@ -41,4 +47,7 @@ GearmanPacket.typesById = [];
 for (var name in GearmanPacket.types) {
     GearmanPacket.types[name].name = name;
     GearmanPacket.typesById[GearmanPacket.types[name].id] = GearmanPacket.types[name];
+}
+for (var name in GearmanPacket.adminTypes) {
+    GearmanPacket.adminTypes[name].name = name;
 }
