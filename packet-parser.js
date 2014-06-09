@@ -208,35 +208,28 @@ Parser.prototype.args = function () {
         }
     }
     if (this.bytes()>=64) {
-        this.emit('error',new Error('In a '+this.packet.type.name+' packet, argument #'+(this.argc+1)+' is missing or more then 64 bytes'));
+        this.emit('error',new Error('In a '+this.packet.type.name+' packet, argument '+
+            this.packet.type.args[this.argc+1]+' (#'+(this.argc+1)+') is missing or more then 64 bytes'));
         return this.body;
     }
 }
 
 Parser.prototype.body = function () {
     this.packet.bodySize = this.packetSize - this.packetArgSize;
-    if (! this.packet.type.body) {
-        if (this.packet.bodySize==0) {
-            delete this.packet.bodySize;
-            this.sendPacket(this.packet);
-            return this.endPacket();
-        }
-        else {
-            return this.bodyarg;
-        }
-    }
-    else if (this.packet.type.body == 'string') {
-        return this.bodystring;
-    }
-    else if (this.packet.type.body == 'stream') {
+    if (this.packet.type.body) {
         this.packet.body = new stream.PassThrough();
         this.packet.body.length = this.packet.bodySize;
         this.bodyRead = 0;
         this.sendPacket(this.packet);
         return this.bodystream;
     }
+    else if (this.packet.bodySize==0) {
+        delete this.packet.bodySize;
+        this.sendPacket(this.packet);
+        return this.endPacket();
+    }
     else {
-        throw new Error('Unknown packet body type '+this.packet.type.body+', expected string or stream');
+        return this.bodyarg;
     }
     
 }
@@ -292,13 +285,6 @@ Parser.prototype.bodystream = function (done) {
         this.buffer = null;
         return NOT_DONE;
     }
-}
-
-Parser.prototype.bodystring = function () {
-    if (this.bytes() < this.packet.bodySize) return;
-    this.packet.body = this.readBuffer(this.packet.bodySize).toString();
-    this.sendPacket(this.packet);
-    return this.endPacket();
 }
 
 Parser.prototype.admin = function () {

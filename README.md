@@ -47,16 +47,20 @@ Packet objects have the following properties:
 * kind: 'request'|'response'|'admin'
 * type: typeobject
 * args: typeargshash
-* body: buffer|string|stream
+* body: boolean
 * bodySize: integer
 
-Kind should be request or response.  Type is one of the objects stored in `GearmanPacket.types`.  Types are simple objects that look like this:
+Kind should be request or response.  Type is one of the objects stored in
+`GearmanPacket.types`.  Types are simple objects that look like this:
 
-    {name: 'SUBMIT_JOB', id: 7, args: ['function','uniqueid'], body: 'stream'}
+    {name: 'SUBMIT_JOB', id: 7, args: ['function','uniqueid'], body: true}
 
 The typeargshash is just a key/value pair, whose keys should match the args in the type object.
 
-The body can be simple, in which case it should be a buffer or a string, and there's no need to include a bodySize.  Or, if body is a stream object then you must also tell us how big it's going to be by setting a bodySize.  Body streams will indeed have their content streamed out, without buffering.
+The body can be simple, in which case it should be a buffer or a string, and
+there's no need to include a bodySize.  Or, if body is a stream object then
+you must also tell us how big it's going to be by setting a bodySize.  Body
+streams will indeed have their content streamed out, without buffering.
 
 Examples
 --------

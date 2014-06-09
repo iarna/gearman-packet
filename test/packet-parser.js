@@ -331,7 +331,7 @@ test("args",function (t) {
 });
 
 test("body",function (t) {
-    t.plan(13);
+    t.plan(9);
 
     parser.packetSize = 10;
     parser.packetArgSize = 5;
@@ -346,14 +346,7 @@ test("body",function (t) {
     t.is(lastError, null, 'No error');
     t.is(lastPushed, packet, 'Pushed our packet object');
 
-    parser.packet = {type: {body: 'string'}};
-    parser.packetSize = 100;
-    parser.packetArgSize = 30;
-    stateChanged(t, parser.body, parser.bodystring, 'A string body means the bodystring state');
-    t.is(lastError, null, 'No error');
-    t.is(parser.packet.bodySize, 70, 'Body size computed correctly');
-
-    parser.packet = {type: {body: 'stream'}};
+    parser.packet = {type: {body: true}};
     parser.packetSize = 100;
     parser.packetArgSize = 30;
     stateChanged(t, parser.body, parser.bodystream, 'A stream body means the bodystream state');
@@ -361,17 +354,6 @@ test("body",function (t) {
     t.is(lastPushed, parser.packet, 'Pushed our packet object');
     t.ok(parser.packet.body instanceof stream.Readable, 'Body is a readable stream');
 
-    parser.packet = {type: {body: 'WIBBLE'}};
-    parser.packetSize = 100;
-    parser.packetArgSize = 30;
-    var error;
-    try {
-        stateChanged(t, parser.body, parser.bodybuffer, 'An unknown body type means the bodybuffer state');
-    }
-    catch (e) {
-        error = e;
-    }
-    t.notEqual(error,null,'An unknown body type throws an error');
 });
 
 test("bodyarg",function (t) {
@@ -389,22 +371,6 @@ test("bodyarg",function (t) {
     t.is(lastError, null, 'No error');
     t.is(lastPushed, packet, 'We pushed the packet');
     t.is(packet.args.foo, 'abcd', 'The packet had our data in its args');
-    t.is(parser.packet, null, 'the in-progress packet has been cleared');
-});
-
-test("bodystring",function (t) {
-    t.plan(7);
-    reset('abc');
-    parser.packet = {bodySize: 4};
-    stateNotChanged(t, parser.bodystring, 'We do nothing with fewer than bodySize bytes');
-    t.is(lastError, null, 'No error');
-    t.is(lastPushed, null, 'No packet pushed');
-
-    reset('abcd');
-    parser.packet = {bodySize: 4};
-    stateChanged(t, parser.bodystring, parser.detect, 'We completed this packet, go to start');
-    t.is(lastError, null, 'No error');
-    t.is(lastPushed?lastPushed.body:'', 'abcd', 'We pushed the packet with our body');
     t.is(parser.packet, null, 'the in-progress packet has been cleared');
 });
 
