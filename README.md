@@ -17,13 +17,27 @@ Classes
 
 `var GearmanPacket = require('gearman-packet');`
 
-* `var parser = new GearmanPacket.Parser();`
+* `var parser = new GearmanPacket.Parser(options);`
 
-This is an stream Transform class, so you can pipe buffers into it and it emits objects. Typical use is to pipe a socket into it and pipe the parser into something that acts on the packet objects. See Packet Objects below for details on what those look like.
+This is an stream Transform class, so you can pipe buffers into it and it
+emits objects.  Typical use is to pipe a socket into it and pipe the parser
+into something that acts on the packet objects.  See Packet Objects below
+for details on what those look like.
+
+The options argument is optional and takes any properties
+valid for a stream Transform option argument, additionally it also takes:
+
+`maxPacketSize` - Any packet larger then this number of bytes will be
+skipped and an erro emitted.  If you don't specify this then per the
+protocol spec, packets of up to 2^32 (4,294,967,295) bytes will be accepted.
+As this would ordinarily cause memory issues, its highly recommended that
+you set this to something appropriate for your workload.
 
 * `var emitter = new GearmanPacket.Emitter();`
 
-This too is a stream Transform class. It accepts objects like those the Parser emits and emits buffers. Typical use is to pipe the emitter into a socket and then write objects to the emitter.
+This too is a stream Transform class. It accepts objects like those the
+Parser emits and emits buffers.  Typical use is to pipe the emitter into a
+socket and then write objects to the emitter.
 
 Packet Objects
 ==============

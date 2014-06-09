@@ -7,6 +7,7 @@ var Parser = module.exports = function (options) {
     if (!options) options = {};
     options.objectMode = true;
     stream.Transform.call(this,options);
+    this.maxPacketSize = options.maxPacketSize;
     this.state = this.detect;
     this.buffer = null;
     this.offset = 0;
@@ -157,6 +158,11 @@ Parser.prototype.type = function () {
 Parser.prototype.size = function () {
     if (this.bytes() < 4)  return;
     this.packetSize = this.readUInt32BE();
+    if (this.maxPacketSize && this.packetSize > this.maxPacketSize) {
+        this.emit('error',new Error('Packet exceeds maximum packet size ('+this.packetSize+' > '+this.maxPacketSize+')'));
+        this.packetRead = 0;
+        return this.packetSkip;
+    }
     this.packetArgSize = 0;
     this.packet.args = {};
     for (var ii in this.packet.type.args) {
@@ -172,6 +178,19 @@ Parser.prototype.size = function () {
     }
     else {
         return this.body;
+    }
+}
+
+Parser.prototype.packetSkip = function () {
+    if (this.packetRead + this.bytes() >= this.packetSize) {
+        var self = this;
+        this.consume(this.packetSize-this.packetRead);
+        return self.endPacket();
+    }
+    else {
+        this.packetRead += this.bytes();
+        this.clearBuffer();
+        return;
     }
 }
 
@@ -232,6 +251,7 @@ Parser.prototype.sendPacket = function(packet) {
 Parser.prototype.endPacket = function(packet) {
     this.packet = null;
     this.packetSize = null;
+    this.packetRead = null;
     this.packetArgSize = null;
     this.argc = null;
     this.bodyRead = null;
