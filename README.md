@@ -28,7 +28,7 @@ The options argument is optional and takes any properties
 valid for a stream Transform option argument, additionally it also takes:
 
 `maxPacketSize` - Any packet larger then this number of bytes will be
-skipped and an erro emitted.  If you don't specify this then per the
+skipped and an error emitted.  If you don't specify this then per the
 protocol spec, packets of up to 2^32 (4,294,967,295) bytes will be accepted.
 As this would ordinarily cause memory issues, its highly recommended that
 you set this to something appropriate for your workload.
@@ -46,7 +46,7 @@ Packet objects have the following properties:
 
 * kind: 'request'|'response'|'admin'
 * type: typeobject
-* args: typeargshash
+* args: argsobject
 * body: boolean
 * bodySize: integer
 
@@ -55,13 +55,16 @@ Kind should be request or response.  Type is one of the objects stored in
 
     {name: 'SUBMIT_JOB', id: 7, args: ['function','uniqueid'], body: true}
 
-The typeargshash is just a key/value pair, whose keys should match the args in the type object.
+The argsobject's properties must be listed in the type object's args property.
 
-The body can be simple, in which case it should be a buffer or a string, and
-there's no need to include a bodySize.  Or, if body is a stream object then
-you must also tell us how big it's going to be by setting a bodySize.  Body
-streams will indeed have their content streamed out, without buffering.
+The the parser only produces body's which are streams.  The streams it produces have a length attribute telling you how many bytes are in the body-- that is, its the same as the bodySize attribute on the packet object.
 
+The emitter accepts a variety of data types for the body:
+* A buffer, in which case its emitted as-is.
+* A string, which is converted into a buffer and emitted.
+* A stream, which is piped into our output. Streams must either have a length attribute of their own or be included with a packet that has a bodySize attribute.
+* Anything else, in which we call toString() on it and then convert that into a buffer and emit it.
+    
 Examples
 --------
 
