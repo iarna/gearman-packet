@@ -124,12 +124,12 @@ Parser.prototype.detect = function () {
     }
     else {
         this.consume(1);
-        return this.magic;
+        return this.header;
     }
 }
 
-Parser.prototype.magic = function () {
-    if (this.bytes() < 3) return;
+Parser.prototype.header = function () {
+    if (this.bytes() < 11) return;
     var magic = this.buffer.slice(this.offset,this.offset+3).toString('ascii');
     if (magic == 'REQ') {
         this.packet = { kind: 'request' }
@@ -142,22 +142,11 @@ Parser.prototype.magic = function () {
         return this.endPacket();
     }
     this.consume(3);
-    return this.type;
-}
-
-Parser.prototype.type = function () {
-    if (this.bytes() < 4) return;
     var type = this.readUInt32BE();
     if (!(this.packet.type = Packet.typesById[type])) {
         this.packet.type = {id: type, args: [], body: 'stream', name: 'unknown#'+type};
         this.emit('error',new Error('Unknown packet type: '+type));
     }
-    return this.size;
-}
-
-Parser.prototype.size = function () {
-    if (this.bytes() < 4)  return;
-    this.packetSize = this.readUInt32BE();
     if (this.maxPacketSize && this.packetSize > this.maxPacketSize) {
         this.emit('error',new Error('Packet exceeds maximum packet size ('+this.packetSize+' > '+this.maxPacketSize+')'));
         this.packetRead = 0;

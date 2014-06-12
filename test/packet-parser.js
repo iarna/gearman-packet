@@ -181,7 +181,7 @@ test("detect",function (t) {
     t.is( lastError, null, "No errors");
 
     reset([0]);
-    stateChanged(t, parser.detect, parser.magic, "Moved on to the magic state" );
+    stateChanged(t, parser.detect, parser.header, "Moved on to the header state" );
     t.is( parser.bytes(), 0, "Consumed our buffer" );
     t.is( lastError, null, "No errors");
 
@@ -191,70 +191,50 @@ test("detect",function (t) {
     t.is( lastError, null, "No errors");
 });
 
-test("magic",function (t) {
-    t.plan(14);
+test("header",function (t) {
+    t.plan(31);
 
     reset('NO');
-    stateNotChanged(t, parser.magic);
+    stateNotChanged(t, parser.header);
     t.is( lastError, null, "No error" );
-    t.is( parser.bytes(), 2, "Giving it fewer than three bytes does nothing" );
+    t.is( parser.bytes(), 2, "Giving it fewer than eleven bytes does nothing" );
 
-    reset('BAD');
-    stateChanged(t, parser.magic, parser.detect, "Random bytes are reparsed");
-    t.notEqual( lastError, null, 'No matching magic results in error' );
-    t.is( parser.bytes(), 3, "No matching magic consumes no bytes" );
+    reset('BAD456789012');
+    stateChanged(t, parser.header, parser.detect, "Random bytes are reparsed");
+    t.notEqual( lastError, null, 'No matching header results in error' );
+    t.is( parser.bytes(), 12, "No matching header consumes no bytes" );
 
-    reset('REQ');
-    stateChanged(t, parser.magic, parser.type, "Moved on to reading the packet type");
+    reset('REQ\0\0\0\u0001\0\0\0\0');
+    stateChanged(t, parser.header, parser.body, "Moved on to reading the body");
     t.is( lastError, null, "No error" );
-    t.is( parser.bytes(), 0, "Consumed the magic text" );
-    t.is( parser.packet.kind, 'request', "REQ magic results in a request packet" );
+    t.is( parser.bytes(), 0, "Consumed the header text" );
+    t.is( parser.packet.kind, 'request', "REQ header results in a request packet" );
 
-    reset('RES');
-    stateChanged(t, parser.magic, parser.type, "Moved on to reading the packet type");
+    reset('RES\0\0\0\u0001\0\0\0\0');
+    stateChanged(t, parser.header, parser.body, "Moved on to reading the body");
     t.is( lastError, null, "No error" );
-    t.is( parser.bytes(), 0, "Consumed the magic text" );
-    t.is( parser.packet.kind, 'response', "RES magic results in a response packet" );
-});
+    t.is( parser.bytes(), 0, "Consumed the header text" );
+    t.is( parser.packet.kind, 'response', "RES header results in a response packet" );
 
-test("type",function (t) {
-    t.plan(9);
-
-    reset('NO');
-    stateNotChanged(t, parser.type);
-    t.is( lastError, null, 'No error');
-    t.is( parser.bytes(), 2, "Giving it fewer than four bytes does nothing" );
-
-    reset([0,0,0,1]);
-    stateChanged(t, parser.type, parser.size, "Giving a type advances to reading a size" );
+    reset('REQ\0\0\0\u0001\0\0\0\0');
+    stateChanged(t, parser.header, parser.body, "Giving a type advances to reading the body");
     t.is( lastError, null, 'No error');
     t.is( parser.packet.type.name, 'CAN_DO', "Set the packet type to CAN_DO" );
 
-    reset([0,0,1,0]);
-    stateChanged(t, parser.type, parser.size, "Giving a type advances to reading a size" );
+    reset('REQ\0\0\u0001\0\0\0\0\0');
+    stateChanged(t, parser.header, parser.packetSkip, "Giving an unknown type skips the packet" );
     t.notEqual( lastError, null, 'Unknown types emit errors' );
     t.is( parser.packet.type.name, 'unknown#256', "Unknown packet types are unknown" );
-});
 
-test("size",function (t) {
-    t.plan(14);
-
-    reset('NO');
-    stateNotChanged(t, parser.size);
-    t.is( lastError, null, 'No error');
-    t.is( parser.bytes(), 2, "Giving it fewer than four bytes does nothing" );
-
-    parser.packet = {type: {args: []}};
-    reset([0,0,0,20]);
-    stateChanged(t, parser.size, parser.body, "No arguments means jumping to the body");
+    reset('REQ\0\0\0\u0003\0\0\0\u0001'); // RESET_ABILITIES
+    stateChanged(t, parser.header, parser.body, "No arguments means jumping to the body");
     t.is( lastError, null, 'No error');
     t.is( parser.bytes(), 0, "Read all the size bytes" );
     t.is( Object.keys(parser.packet.args).length, 0, "No args results in empty args array" );
     t.is( parser.packetArgSize, 0, "No argument bytes read yet" );
 
-    parser.packet = {type: {args: ['one','two','three','four','five']}};
-    reset([0,0,0,20]);
-    stateChanged(t, parser.size, parser.args, "Go to the arguments parser");
+    reset('REQ\0\0\0\u0014\0\0\0\u0001'); // STATUS_RES
+    stateChanged(t, parser.header, parser.args, "Go to the arguments parser");
     t.is( lastError, null, 'No error');
     t.is( parser.bytes(), 0, "Read all the size bytes" );
     t.is( Object.keys(parser.packet.args).length, 5, "Args object initialized to correct size" );
