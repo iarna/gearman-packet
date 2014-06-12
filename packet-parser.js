@@ -143,13 +143,15 @@ Parser.prototype.header = function () {
     }
     this.consume(3);
     var type = this.readUInt32BE();
+    this.packetSize = this.readUInt32BE();
     if (!(this.packet.type = Packet.typesById[type])) {
         this.packet.type = {id: type, args: [], body: 'stream', name: 'unknown#'+type};
         this.emit('error',new Error('Unknown packet type: '+type));
+        this.packetRead = 0;
+        return this.packetSkip;
     }
     if (this.maxPacketSize && this.packetSize > this.maxPacketSize) {
         this.emit('error',new Error('Packet exceeds maximum packet size ('+this.packetSize+' > '+this.maxPacketSize+')'));
-        this.packetRead = 0;
         return this.packetSkip;
     }
     this.packetArgSize = 0;
