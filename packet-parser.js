@@ -156,15 +156,11 @@ Parser.prototype.header = function () {
     }
     this.packetArgSize = 0;
     this.packet.args = {};
+    this.argc = 0;
     for (var ii in this.packet.type.args) {
         this.packet.args[this.packet.type.args[ii]] = void 0;
     }
-    if (!this.packet.type.body && this.packet.type.args.length==1) {
-        this.argc = 0;
-        return this.body;
-    }
-    else if (this.packet.type.args.length) {
-        this.argc = 0;
+    if (this.packet.type.args.length && (this.packet.type.body || this.packet.type.args.length > 1)) {
         return this.args;
     }
     else {
