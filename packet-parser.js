@@ -5,8 +5,9 @@ var Packet = require('./packet-types');
 
 var Parser = module.exports = function (options) {
     if (!options) options = {};
-    options.objectMode = true;
     stream.Transform.call(this,options);
+    this._writableState.objectMode = false;
+    this._readableState.objectMode = true;
     this.maxPacketSize = options.maxPacketSize;
     this.state = this.detect;
     this.buffer = null;
