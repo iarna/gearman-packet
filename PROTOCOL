@@ -52,49 +52,56 @@ header is:
 4 byte type       - A big-endian (network-order) integer containing
                     an enumerated packet type. Possible values are:
 
-                    #   Name                Magic  Type
-                    1   CAN_DO              REQ    Worker
-                    2   CANT_DO             REQ    Worker
-                    3   RESET_ABILITIES     REQ    Worker
-                    4   PRE_SLEEP           REQ    Worker
-                    5   (unused)            -      -
-                    6   NOOP                RES    Worker
-                    7   SUBMIT_JOB          REQ    Client
-                    8   JOB_CREATED         RES    Client
-                    9   GRAB_JOB            REQ    Worker
-                    10  NO_JOB              RES    Worker
-                    11  JOB_ASSIGN          RES    Worker
-                    12  WORK_STATUS         REQ    Worker
-                                            RES    Client
-                    13  WORK_COMPLETE       REQ    Worker
-                                            RES    Client
-                    14  WORK_FAIL           REQ    Worker
-                                            RES    Client
-                    15  GET_STATUS          REQ    Client
-                    16  ECHO_REQ            REQ    Client/Worker
-                    17  ECHO_RES            RES    Client/Worker
-                    18  SUBMIT_JOB_BG       REQ    Client
-                    19  ERROR               RES    Client/Worker
-                    20  STATUS_RES          RES    Client
-                    21  SUBMIT_JOB_HIGH     REQ    Client
-                    22  SET_CLIENT_ID       REQ    Worker
-                    23  CAN_DO_TIMEOUT      REQ    Worker
-                    24  ALL_YOURS           REQ    Worker
-                    25  WORK_EXCEPTION      REQ    Worker
-                                            RES    Client
-                    26  OPTION_REQ          REQ    Client/Worker
-                    27  OPTION_RES          RES    Client/Worker
-                    28  WORK_DATA           REQ    Worker
-                                            RES    Client
-                    29  WORK_WARNING        REQ    Worker
-                                            RES    Client
-                    30  GRAB_JOB_UNIQ       REQ    Worker
-                    31  JOB_ASSIGN_UNIQ     RES    Worker
-                    32  SUBMIT_JOB_HIGH_BG  REQ    Client
-                    33  SUBMIT_JOB_LOW      REQ    Client
-                    34  SUBMIT_JOB_LOW_BG   REQ    Client
-                    35  SUBMIT_JOB_SCHED    REQ    Client
-                    36  SUBMIT_JOB_EPOCH    REQ    Client
+                    #   Name                 Magic  Type
+                    1   CAN_DO               REQ    Worker
+                    2   CANT_DO              REQ    Worker
+                    3   RESET_ABILITIES      REQ    Worker
+                    4   PRE_SLEEP            REQ    Worker
+                    5   (unused)             -      -
+                    6   NOOP                 RES    Worker
+                    7   SUBMIT_JOB           REQ    Client
+                    8   JOB_CREATED          RES    Client
+                    9   GRAB_JOB             REQ    Worker
+                    10  NO_JOB               RES    Worker
+                    11  JOB_ASSIGN           RES    Worker
+                    12  WORK_STATUS          REQ    Worker
+                                             RES    Client
+                    13  WORK_COMPLETE        REQ    Worker
+                                             RES    Client
+                    14  WORK_FAIL            REQ    Worker
+                                             RES    Client
+                    15  GET_STATUS           REQ    Client
+                    16  ECHO_REQ             REQ    Client/Worker
+                    17  ECHO_RES             RES    Client/Worker
+                    18  SUBMIT_JOB_BG        REQ    Client
+                    19  ERROR                RES    Client/Worker
+                    20  STATUS_RES           RES    Client
+                    21  SUBMIT_JOB_HIGH      REQ    Client
+                    22  SET_CLIENT_ID        REQ    Worker
+                    23  CAN_DO_TIMEOUT       REQ    Worker
+                    24  ALL_YOURS            REQ    Worker
+                    25  WORK_EXCEPTION       REQ    Worker
+                                             RES    Client
+                    26  OPTION_REQ           REQ    Client/Worker
+                    27  OPTION_RES           RES    Client/Worker
+                    28  WORK_DATA            REQ    Worker
+                                             RES    Client
+                    29  WORK_WARNING         REQ    Worker
+                                             RES    Client
+                    30  GRAB_JOB_UNIQ        REQ    Worker
+                    31  JOB_ASSIGN_UNIQ      RES    Worker
+                    32  SUBMIT_JOB_HIGH_BG   REQ    Client
+                    33  SUBMIT_JOB_LOW       REQ    Client
+                    34  SUBMIT_JOB_LOW_BG    REQ    Client
+                    35  SUBMIT_JOB_SCHED     REQ    Client
+                    36  SUBMIT_JOB_EPOCH     REQ    Client
+                                             
+                    37  SUBMIT_REDUCE_JOB    REQ    Client
+                    38  SUBMIT_REDUCE_JOB_BG REQ    Client
+                    39  GRAB_JOB_ALL         REQ    Worker
+                    40  JOB_ASSIGN_ALL       RES    Worker
+                    41  GET_STATUS_UNIQ      REQ    Client/Worker
+                    42  STATUS_RES_UNIQ      RES    Client/Worker
 
 4 byte size       - A big-endian (network-order) integer containing
                     the size of the data being sent after the header.
@@ -458,7 +465,26 @@ information and run some administrative tasks. This runs on the same
 port as the binary protocol, and the server differentiates between
 the two by looking at the first character. If it is a NULL (\0),
 then it is binary, if it is non-NULL, that it attempts to parse it
-as a text command. The following commands are supported:
+as a text command.
+
+Arguments are separated by whitespace. Commands are terminated with a CRLF,
+although just an LF will be accepted as well.
+
+Responses from the server can be:
+
+ERR
+    Arguments:
+    - An all caps error code
+    - The human readable error message
+
+OK
+    Arguments:
+    - Optional, the result of your query.
+
+Or some number of arbitrarly formatted rows, terminated by a period.  See
+the command descriptions for details on the formatting.
+
+The following commands are supported:
 
 workers
 
@@ -511,6 +537,60 @@ version
     Arguments:
     - None.
 
+verbose
+
+    Send back the verbosity level of the server.
+
+    Arguments:
+    - None.
+
+getpid
+
+    Send back the pid of the gearman server.
+
+    Arguments:
+    - None.
+
+cancel job
+
+    Cancels a running job. Useful in particular with background jobs lacking
+    workers or jobs scheduled to run in the future.
+
+    Arguments:
+    - The job id.
+
+create function
+
+    Register a function without attaching a worker or job to it.
+
+    Arguments:
+    - Function name.
+
+drop function
+
+    Remove an otherwise unused function. If a job or worker is associated
+    with the function, an error will be emitted.
+
+    Arguments:
+    - Function name.
+
+show jobs
+
+    List all running jobs and their statuses. The list is terminated by a
+    "." on a its own line. The format of each line is:
+
+    JOB_HANDLE\tRETRIES\tIGNORE_JOB\tJOB_QUEUED
+
+    Arguments:
+    - None.
+
+show unique jobs
+
+    List all of the unique job identifiers, one per line, terminated
+    by a "." on its own line.
+
+    Arguments:
+    - None.
 
 The Perl version also has a 'gladiator' command that uses the
 'Devel::Gladiator' Perl module and is used for debugging.
