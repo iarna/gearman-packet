@@ -46,66 +46,64 @@ Requests and responses are encapsulated by a binary packet. A binary
 packet consists of a header which is optionally followed by data. The
 header is:
 
-4 byte magic code - This is either "\0REQ" for requests or "\0RES"
-                    for responses.
+<dl>
+<dt>4 byte magic code</dt><dd>This is either "\0REQ" for requests or "\0RES" for responses.</dd>
+<dt>4 byte type</dt><dd>A big-endian (network-order) integer containing an enumerated packet type. Possible values are:</dd>
+</dl>
 
-4 byte type       - A big-endian (network-order) integer containing
-                    an enumerated packet type. Possible values are:
+| #   | Name                 | Magic  | Type          |
+| --- | -------------------- | ------ | ----          |
+| 1   | CAN_DO               | REQ    | Worker        |
+| 2   | CANT_DO              | REQ    | Worker        |
+| 3   | RESET_ABILITIES      | REQ    | Worker        |
+| 4   | PRE_SLEEP            | REQ    | Worker        |
+| 5   | (unused)             | -      | -             |
+| 6   | NOOP                 | RES    | Worker        |
+| 7   | SUBMIT_JOB           | REQ    | Client        |
+| 8   | JOB_CREATED          | RES    | Client        |
+| 9   | GRAB_JOB             | REQ    | Worker        |
+| 10  | NO_JOB               | RES    | Worker        |
+| 11  | JOB_ASSIGN           | RES    | Worker        |
+| 12  | WORK_STATUS          | REQ    | Worker        |
+|     |                      | RES    | Client        |
+| 13  | WORK_COMPLETE        | REQ    | Worker        |
+|     |                      | RES    | Client        |
+| 14  | WORK_FAIL            | REQ    | Worker        |
+|     |                      | RES    | Client        |
+| 15  | GET_STATUS           | REQ    | Client        |
+| 16  | ECHO_REQ             | REQ    | Client/Worker |
+| 17  | ECHO_RES             | RES    | Client/Worker |
+| 18  | SUBMIT_JOB_BG        | REQ    | Client        |
+| 19  | ERROR                | RES    | Client/Worker |
+| 20  | STATUS_RES           | RES    | Client        |
+| 21  | SUBMIT_JOB_HIGH      | REQ    | Client        |
+| 22  | SET_CLIENT_ID        | REQ    | Worker        |
+| 23  | CAN_DO_TIMEOUT       | REQ    | Worker        |
+| 24  | ALL_YOURS            | REQ    | Worker        |
+| 25  | WORK_EXCEPTION       | REQ    | Worker        |
+|     |                      | RES    | Client        |
+| 26  | OPTION_REQ           | REQ    | Client/Worker |
+| 27  | OPTION_RES           | RES    | Client/Worker |
+| 28  | WORK_DATA            | REQ    | Worker        |
+|     |                      | RES    | Client        |
+| 29  | WORK_WARNING         | REQ    | Worker        |
+|     |                      | RES    | Client        |
+| 30  | GRAB_JOB_UNIQ        | REQ    | Worker        |
+| 31  | JOB_ASSIGN_UNIQ      | RES    | Worker        |
+| 32  | SUBMIT_JOB_HIGH_BG   | REQ    | Client        |
+| 33  | SUBMIT_JOB_LOW       | REQ    | Client        |
+| 34  | SUBMIT_JOB_LOW_BG    | REQ    | Client        |
+| 35  | SUBMIT_JOB_SCHED     | REQ    | Client        |
+| 36  | SUBMIT_JOB_EPOCH     | REQ    | Client        |
+|     |                      |        |               |
+| 37  | SUBMIT_REDUCE_JOB    | REQ    | Client        |
+| 38  | SUBMIT_REDUCE_JOB_BG | REQ    | Client        |
+| 39  | GRAB_JOB_ALL         | REQ    | Worker        |
+| 40  | JOB_ASSIGN_ALL       | RES    | Worker        |
+| 41  | GET_STATUS_UNIQ      | REQ    | Client/Worker |
+| 42  | STATUS_RES_UNIQ      | RES    | Client/Worker |
 
-#  |Name                |Magic |Type
----|--------------------|------|----
-1  |CAN_DO              |REQ   |Worker
-2  |CANT_DO             |REQ   |Worker
-3  |RESET_ABILITIES     |REQ   |Worker
-4  |PRE_SLEEP           |REQ   |Worker
-5  |(unused)            |-     |-
-6  |NOOP                |RES   |Worker
-7  |SUBMIT_JOB          |REQ   |Client
-8  |JOB_CREATED         |RES   |Client
-9  |GRAB_JOB            |REQ   |Worker
-10 |NO_JOB              |RES   |Worker
-11 |JOB_ASSIGN          |RES   |Worker
-12 |WORK_STATUS         |REQ   |Worker
-   |                    |RES   |Client
-13 |WORK_COMPLETE       |REQ   |Worker
-   |                    |RES   |Client
-14 |WORK_FAIL           |REQ   |Worker
-   |                    |RES   |Client
-15 |GET_STATUS          |REQ   |Client
-16 |ECHO_REQ            |REQ   |Client/Worker
-17 |ECHO_RES            |RES   |Client/Worker
-18 |SUBMIT_JOB_BG       |REQ   |Client
-19 |ERROR               |RES   |Client/Worker
-20 |STATUS_RES          |RES   |Client
-21 |SUBMIT_JOB_HIGH     |REQ   |Client
-22 |SET_CLIENT_ID       |REQ   |Worker
-23 |CAN_DO_TIMEOUT      |REQ   |Worker
-24 |ALL_YOURS           |REQ   |Worker
-25 |WORK_EXCEPTION      |REQ   |Worker
-   |                    |RES   |Client
-26 |OPTION_REQ          |REQ   |Client/Worker
-27 |OPTION_RES          |RES   |Client/Worker
-28 |WORK_DATA           |REQ   |Worker
-   |                    |RES   |Client
-29 |WORK_WARNING        |REQ   |Worker
-   |                    |RES   |Client
-30 |GRAB_JOB_UNIQ       |REQ   |Worker
-31 |JOB_ASSIGN_UNIQ     |RES   |Worker
-32 |SUBMIT_JOB_HIGH_BG  |REQ   |Client
-33 |SUBMIT_JOB_LOW      |REQ   |Client
-34 |SUBMIT_JOB_LOW_BG   |REQ   |Client
-35 |SUBMIT_JOB_SCHED    |REQ   |Client
-36 |SUBMIT_JOB_EPOCH    |REQ   |Client
-   |                    |      |
-37 |SUBMIT_REDUCE_JOB   |REQ   |Client
-38 |SUBMIT_REDUCE_JOB_BG|REQ   |Client
-39 |GRAB_JOB_ALL        |REQ   |Worker
-40 |JOB_ASSIGN_ALL      |RES   |Worker
-41 |GET_STATUS_UNIQ     |REQ   |Client/Worker
-42 |STATUS_RES_UNIQ     |RES   |Client/Worker
-
-4 byte size       - A big-endian (network-order) integer containing
-                    the size of the data being sent after the header.
+<dl><dt>4 byte size</dt><dd>A big-endian (network-order) integer containing the size of the data being sent after the header.</dd></dl>
 
 Arguments given in the data part are separated by a NULL byte, and
 the last argument is determined by the size of data after the last
@@ -538,7 +536,7 @@ running jobs, and the number of capable workers. The columns are
 tab separated, and the list is terminated with a line containing
 a single '.' (period). The format is:
 
-FUNCTION\tTOTAL\tRUNNING\tAVAILABLE_WORKERS
+FUNCTION<b>\t</b>TOTAL<b>\t</b>RUNNING<b>\t</b>AVAILABLE_WORKERS
 
 Arguments:
 
@@ -620,7 +618,7 @@ Arguments:
 List all running jobs and their statuses. The list is terminated by a
 "." on a its own line. The format of each line is:
 
-JOB_HANDLE\tRETRIES\tIGNORE_JOB\tJOB_QUEUED
+JOB_HANDLE<b>\t</b>RETRIES<b>\t</b>IGNORE_JOB<b>\t</b>JOB_QUEUED
 
 Arguments:
 
