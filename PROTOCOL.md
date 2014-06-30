@@ -1,4 +1,4 @@
-*This document was originally published http://gearman.org/protocol/ and has been updated to include the latest features from the C++ gearmand.*
+*This document was originally published at http://gearman.org/protocol/ and has been updated to include the latest features from the C++ gearmand.*
 
 Gearman Protocol
 ----------------
