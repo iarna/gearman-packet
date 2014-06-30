@@ -97,7 +97,6 @@ header is:
 | 34  | SUBMIT_JOB_LOW_BG    | REQ    | Client        |
 | 35  | SUBMIT_JOB_SCHED     | REQ    | Client        |
 | 36  | SUBMIT_JOB_EPOCH     | REQ    | Client        |
-|     |                      |        |               |
 | 37  | SUBMIT_REDUCE_JOB    | REQ    | Client        |
 | 38  | SUBMIT_REDUCE_JOB_BG | REQ    | Client        |
 | 39  | GRAB_JOB_ALL         | REQ    | Worker        |
@@ -181,8 +180,7 @@ Arguments:
 
 ### SUBMIT_JOB_SCHED
 
-Just like SUBMIT_JOB_BG, but run job at given time instead of
-immediately. This is not currently used and may be removed.
+Just like SUBMIT_JOB_BG, but run the job regularly when the current time matches the arguments. This is not currently used and may be removed.
 
 Arguments:
 
@@ -198,7 +196,7 @@ Arguments:
 ### SUBMIT_JOB_EPOCH
 
 Just like SUBMIT_JOB_BG, but run job at given time instead of
-immediately. This is not currently used and may be removed.
+immediately.
 
 Arguments:
 
@@ -225,6 +223,18 @@ Arguments:
 
 - Name of the option to set. Possibilities are:
   * "exceptions" - Forward WORK_EXCEPTION packets to the client.
+
+### SUBMIT_REDUCE_JOB
+
+A C++ gearmand undocumented extension.
+
+### SUBMIT_REDUCE_JOB_BG
+
+A C++ gearmand undocumented extension.
+
+### GET_STATUS_UNIQ
+
+A C++ gearmand undocumented extension.
 
 
 Client Responses
@@ -270,6 +280,11 @@ Successful response to the OPTION_REQ request.
 Arguments:
 
 - Name of the option that was set, see OPTION_REQ for possibilities.
+
+### STATUS_RES_UNIQ
+
+A C++ gearmand undocumented extension.
+
 
 
 Worker Requests
@@ -434,6 +449,10 @@ Arguments:
 
 - None.
 
+### GRAB_JOB_ALL
+
+A C++ gearmand undocumented extension.
+
 
 Worker Responses
 ----------------
@@ -483,6 +502,10 @@ Arguments:
 - NULL byte terminated function name.
 - NULL byte terminated unique ID.
 - Opaque data that is given to the function as an argument.
+
+### JOB_ASSIGN_ALL
+
+A C++ gearmand undocumented extension.
 
 
 Administrative Protocol
