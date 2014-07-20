@@ -1,6 +1,12 @@
 {
   "name": "gearman-packet",
   "description": "A streaming gearman parser / emitter suitable for building libraries or servers from",
+  "keywords": [
+    "gearman",
+    "protocal",
+    "parser"
+  ],
+  "author": "Rebecca Turner <me@re-becca.org> (http://re-becca.org)",
   "version": "0.2.1",
   "dependencies": {},
   "main": "gearman-packet.js",
