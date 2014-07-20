@@ -91,12 +91,12 @@ Emitter.prototype.encodeGearman = function (packet,done) {
                 self.emit('error',e);
             }
         });
-        body.on('end', function () {
+        body.once('end', function () {
             if (emitted < body.length) {
                 var missing = new Buffer(body.length-emitted);
                 missing.fill(0);
                 self.push(missing);
-                self.emit('error',new TypeError('Packet body stream length mismatch, got '+expected+' bytes, expected '+expected+' in packet '+util.inspect(packet)));
+                self.emit('error',new TypeError('Packet body stream length mismatch, got '+emitted+' bytes, expected '+buffer.length+' in packet '+util.inspect(packet)));
             }
             done();
         });
