@@ -614,7 +614,7 @@ Arguments:
 
 ### cancel job
 
-Cancels a running job. Useful in particular with background jobs lacking
+Cancels a job. Useful in particular with background jobs lacking
 workers or jobs scheduled to run in the future.
 
 Arguments:
