@@ -1,7 +1,7 @@
 "use strict";
 var test = require('tape');
 var GearmanPacket = require('../gearman-packet.js');
-var stream = require('stream');
+var isaStream = require('isa-stream');
 
 var parser = new GearmanPacket.Parser();
 
@@ -332,7 +332,7 @@ test("body",function (t) {
     stateChanged(t, parser.body, parser.bodystream, 'A stream body means the bodystream state');
     t.is(lastError, null, 'No error');
     t.is(lastPushed, parser.packet, 'Pushed our packet object');
-    t.ok(parser.packet.body instanceof stream.Readable, 'Body is a readable stream');
+    t.ok(isaStream.Readable(parser.packet.body), 'Body is a readable stream');
 
 });
 

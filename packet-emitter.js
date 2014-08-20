@@ -1,7 +1,8 @@
 "use strict";
-var stream = require('stream');
+var stream = require('readable-stream');
 var util = require('util');
 var Packet = require('./packet-types');
+var isaStream = require('isa-stream');
 
 var Emitter = module.exports = function (options) {
     if (!options) options = {};
@@ -77,7 +78,7 @@ Emitter.prototype.encodeGearman = function (packet,done) {
     var body = this.encodeGearmanBody(packet);
     var header = this.encodeGearmanHeader(packet,args.length+body.length);
 
-    if (body instanceof stream.Readable) {
+    if (isaStream.Readable(body)) {
         this.push(Buffer.concat([header,args], header.length+args.length));
         var self = this;
         var emitted = 0;
@@ -149,7 +150,7 @@ Emitter.prototype.encodeGearmanBody = function (packet) {
         var arg = packet.type.args[packet.type.args.length-1];
         return this.toBuffer(packet.args ? packet.args[arg] : new Buffer(0));
     }
-    else if (packet.body instanceof stream.Readable) {
+    else if (isaStream.Readable(packet.body)) {
         if (typeof packet.bodySize == 'number') packet.body.length = packet.bodySize;
         if (packet.body.length == null) {
             throw new TypeError("Streamable gearman packet bodies MUST either have a bodySize passed in with them or a length attribute "+util.inspect(packet));

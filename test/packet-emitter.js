@@ -2,8 +2,8 @@
 var test = require('tape');
 var GearmanPacket = require('../gearman-packet.js');
 var bufferEqual = require('buffer-equal');
-var stream = require('stream');
 var streamify = require('stream-array');
+var isaStream = require('isa-stream');
 
 var bufferIs = function (t,a,b,msg,extra) {
     t._assert( bufferEqual(a,b), {
@@ -150,7 +150,7 @@ test("encodeGearmanBody",function(t) {
     bufferIs(t, buf, new Buffer(0), 'Missing bodies produce empty buffers');
 
     var buf = emitter.encodeGearmanBody({type:{body:'buffer'},body: streamify([new Buffer([1,2,3])]), bodySize:3});
-    t.ok( buf instanceof stream.Readable, 'Streams get passed through' );
+    t.ok( isaStream.Readable(buf), 'Streams get passed through' );
     t.is( buf.length, 3, 'Streams get a length' );
 
     var buf = emitter.encodeGearmanBody({type:{args:[]}});
