@@ -7,7 +7,7 @@
     "parser"
   ],
   "author": "Rebecca Turner <me@re-becca.org> (http://re-becca.org)",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "dependencies": {
     "isa-stream": "^1.0.1",
     "readable-stream": "^1.0.31"
