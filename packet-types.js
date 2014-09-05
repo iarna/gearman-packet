@@ -1,12 +1,11 @@
 "use strict";
-var GearmanPacket = exports;
-GearmanPacket.adminTypes = {
+exports.adminTypes = {
     'error': { args: ['code','message'] },
     'ok': { args: ['line'] },
     'line': { args: ['line'] },
     'block-complete': { args: [] }
 }
-GearmanPacket.types = {
+exports.types = {
     CAN_DO: {id: 1, args: ['function']},
     CANT_DO: {id: 2, args: ['function']},
     RESET_ABILITIES: {id: 3, args: []},
@@ -43,11 +42,11 @@ GearmanPacket.types = {
     SUBMIT_JOB_SCHED: {id: 35, args: ['function','uniqueid','minute','hour','day','month','dow'], body: true},
     SUBMIT_JOB_EPOCH: {id: 36, args: ['function','uniqueid','time'], body: true}
 };
-GearmanPacket.typesById = [];
-for (var name in GearmanPacket.types) {
-    GearmanPacket.types[name].name = name;
-    GearmanPacket.typesById[GearmanPacket.types[name].id] = GearmanPacket.types[name];
+exports.typesById = [];
+for (var name in exports.types) {
+    exports.types[name].name = name;
+    exports.typesById[exports.types[name].id] = exports.types[name];
 }
-for (var name in GearmanPacket.adminTypes) {
-    GearmanPacket.adminTypes[name].name = name;
+for (var name in exports.adminTypes) {
+    exports.adminTypes[name].name = name;
 }
