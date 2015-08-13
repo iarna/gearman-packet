@@ -423,6 +423,10 @@ Arguments:
 This is to notify the server (and any listening clients) that
 the job failed with the given exception.
 
+Despite the way this is worded, in no existing implementation of the
+gearman server does this mark the job as completed. You will need
+to follow up with a WORK_FAIL packet to actually end the job.
+
 Arguments:
 
 - NULL byte terminated job handle.
