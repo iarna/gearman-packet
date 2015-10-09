@@ -13,7 +13,7 @@
     "readable-stream": "^2.0.2"
   },
   "main": "gearman-packet.js",
-  "license": "BSD",
+  "license": "ISC",
   "scripts": {
     "test": "node node_modules/tape/bin/tape $(find test -name '*.js')"
   },
