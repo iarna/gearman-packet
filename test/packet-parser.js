@@ -1,5 +1,5 @@
 "use strict";
-var test = require('tape');
+var test = require('tap').test;
 var GearmanPacket = require('../gearman-packet.js');
 var isaStream = require('isa-stream');
 

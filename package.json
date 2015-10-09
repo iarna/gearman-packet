@@ -15,7 +15,7 @@
   "main": "gearman-packet.js",
   "license": "ISC",
   "scripts": {
-    "test": "node node_modules/tape/bin/tape $(find test -name '*.js')"
+    "test": "tap test/*.js"
   },
   "repository": {
     "type": "git",
@@ -24,7 +24,7 @@
   "devDependencies": {
     "buffer-equal": "~0.0.1",
     "stream-array": "~1.1.1",
-    "tape": "^4.2.1",
+    "tap": "^2.1.1",
     "through2": "^2.0.0"
   },
   "directories": {
