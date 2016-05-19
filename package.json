@@ -10,7 +10,7 @@
   "version": "1.0.3",
   "dependencies": {
     "isa-stream": "^1.0.1",
-    "readable-stream": "^2.0.2"
+    "readable-stream": "^2.1.4"
   },
   "main": "gearman-packet.js",
   "license": "ISC",
