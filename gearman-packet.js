@@ -4,8 +4,9 @@ module.exports = require('./packet-types');
 module.exports.Emitter = require('./packet-emitter');
 module.exports.Parser = require('./packet-parser');
 
+var cachedDefaultTypeData;
 module.exports.withDefaultTypeData = function() {
-    return mergedTypeData( [ module.exports ] );
+    return cachedDefaultTypeData = cachedDefaultTypeData || mergedTypeData( [ module.exports ] );
 };
 
 module.exports.withTypeData = function( typeData ) {
