@@ -83,6 +83,14 @@ Emitter.prototype.encodeGearman = function (packet,done) {
     if (!packet.type) {
         throw new TypeError("Packet missing type in "+util.inspect(packet));
     }
+    if (typeof(packet.type) === 'string') {
+        if ( packet.type in this.packetTypeData.types ) {
+            packet.type = this.packetTypeData.types[ packet.type ];
+        }
+        else {
+            throw new TypeError("Invalid packet type name in "+util.inspect(packet));
+        }
+    }
     var args = this.encodeGearmanArgs(packet);
     var body = this.encodeGearmanBody(packet);
     var header = this.encodeGearmanHeader(packet,args.length+body.length);

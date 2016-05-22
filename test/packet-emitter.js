@@ -72,7 +72,7 @@ test("encodeAdmin",function(t) {
 });
 
 test("encodeGearman",function(t) {
-    t.plan(3);
+    t.plan(8);
     var emitter = new GearmanPacket.Emitter();
     var buf = [];
     emitter.push = function (B){ buf.push(B) }
@@ -81,6 +81,52 @@ test("encodeGearman",function(t) {
         t.deepEqual(buf[0], new Buffer([0,82,69,81,0,0,0,0,0,0,0,3,97,98,99]), 'Encode body buffer');
     });
 
+    buf = [];
+    emitter.encodeGearman({kind:'request', type:'ECHO_REQ', body:new Buffer('abc')}, function () {
+        t.deepEqual(buf[0], new Buffer([0,82,69,81,0,0,0,16,0,0,0,3,97,98,99]), 'Encode with valid string type');
+    });
+
+    buf = [];
+    try {
+        emitter.encodeGearman({kind:'request', type:'FAKE_XXX', body:new Buffer('abc')}, function () {
+        });
+        t.fail('Encode with fake string type did not emit error');
+    }
+    catch ( error ) {
+        t.notEqual( error, null, 'Encode with fake string type should emit error' );
+    }
+
+    var mergedEmitter = new GearmanPacket.Emitter( { withTypeData : {
+        types : { FAKE_XXX : {id: 99, args: [], body: true } }
+    } } );
+    mergedEmitter.push = function (B){ buf.push(B) }
+
+    buf = [];
+    mergedEmitter.encodeGearman({kind:'request', type:'FAKE_XXX', body:new Buffer('abc')}, function () {
+        t.deepEqual(buf[0], new Buffer([0,82,69,81,0,0,0,99,0,0,0,3,97,98,99]), 'Encode with merged string type');
+    });
+
+    buf = [];
+    mergedEmitter.encodeGearman({kind:'request', type:'ECHO_REQ', body:new Buffer('abc')}, function () {
+        t.deepEqual(buf[0], new Buffer([0,82,69,81,0,0,0,16,0,0,0,3,97,98,99]), 'Still encode with valid string type after custom types merged');
+    });
+
+    var customEmitter = new GearmanPacket.Emitter( { withOnlyTypeData : {
+        types : { FAKE_XXX : {id: 99, args: [], body: true } }
+    } } );
+    customEmitter.push = function (B){ buf.push(B) }
+
+    buf = [];
+    try {
+        customEmitter.encodeGearman({kind:'request', type:'ECHO_REQ', body:new Buffer('abc')}, function () {
+        });
+        t.fail('Custom emitter without default type did not emit error for default type');
+    }
+    catch ( error ) {
+        t.notEqual( error, null, 'Custom emitter without default type should emit error for default type' );
+    }
+
+    // NOTE: this must be last as stream encoding is asynchronous and buf must not be altered afterwards
     var stream = streamify([new Buffer('abc')]);
     buf = [];
     emitter.encodeGearman({kind:'request', type:{id:0,args:[],body:'buffer'}, body:stream, bodySize: 3}, function () {
