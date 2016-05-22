@@ -9,6 +9,15 @@ var Emitter = module.exports = function (options) {
     stream.Transform.call(this,options);
     this._writableState.objectMode = true;
     this._readableState.objectMode = false;
+    if ( options.withOnlyTypeData ) {
+        this.packetTypeData = Packet.withOnlyTypeData( options.withOnlyTypeData );
+    }
+    else if ( options.withTypeData ) {
+        this.packetTypeData = Packet.withTypeData( options.withTypeData );
+    }
+    else {
+        this.packetTypeData = Packet.withDefaultTypeData();
+    }
 }
 util.inherits(Emitter, stream.Transform);
 

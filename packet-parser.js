@@ -17,6 +17,15 @@ var Parser = module.exports = function (options) {
     this.packetArgSize = null;
     this.argc = null;
     this.bodyRead = null;
+    if ( options.withOnlyTypeData ) {
+        this.packetTypeData = Packet.withOnlyTypeData( options.withOnlyTypeData );
+    }
+    else if ( options.withTypeData ) {
+        this.packetTypeData = Packet.withTypeData( options.withTypeData );
+    }
+    else {
+        this.packetTypeData = Packet.withDefaultTypeData();
+    }
 }
 util.inherits(Parser, stream.Transform);
 
@@ -145,7 +154,7 @@ Parser.prototype.header = function () {
     this.consume(3);
     var type = this.readUInt32BE();
     this.packetSize = this.readUInt32BE();
-    if (!(this.packet.type = Packet.typesById[type])) {
+    if (!(this.packet.type = this.packetTypeData.typesById[type])) {
         this.packet.type = {id: type, args: [], body: 'stream', name: 'unknown#'+type};
         this.emit('error',new Error('Unknown packet type: '+type));
         this.packetRead = 0;
@@ -190,7 +199,7 @@ Parser.prototype.args = function () {
         this.consume(argBytes);
         this.packetArgSize += argBytes;
         this.packet.args[this.packet.type.args[this.argc++]] = arg.toString();
-        if (this.argc == this.packet.type.args.length || 
+        if (this.argc == this.packet.type.args.length ||
             (!this.packet.type.body && this.argc==this.packet.type.args.length-1) ) {
             return this.body;
         }
@@ -219,7 +228,7 @@ Parser.prototype.body = function () {
     else {
         return this.bodyarg;
     }
-    
+
 }
 
 Parser.prototype.sendPacket = function(packet) {
@@ -283,16 +292,16 @@ Parser.prototype.admin = function () {
         this.consume(cmdBytes);
         var match;
         if (match = cmd.match(/^OK(?:\s+(.*))?$/)) {
-            this.sendPacket({ kind: 'admin', type: Packet.adminTypes['ok'], args: { line: match[1] } });
+            this.sendPacket({ kind: 'admin', type: this.packetTypeData.adminTypes['ok'], args: { line: match[1] } });
         }
         else if (match = cmd.match(/^ERR \s+(\S+)(?:\s+(\S+))?/)) {
-            this.sendPacket({ kind: 'admin', type: Packet.adminTypes['error'], args: { code: match[1], message: match[2] } });
+            this.sendPacket({ kind: 'admin', type: this.packetTypeData.adminTypes['error'], args: { code: match[1], message: match[2] } });
         }
         else if (cmd === '.') {
-            this.sendPacket({ kind: 'admin', type: Packet.adminTypes['block-complete'], args: {} });
+            this.sendPacket({ kind: 'admin', type: this.packetTypeData.adminTypes['block-complete'], args: {} });
         }
         else {
-            this.sendPacket({ kind: 'admin', type: Packet.adminTypes['line'], args: { line: cmd } });
+            this.sendPacket({ kind: 'admin', type: this.packetTypeData.adminTypes['line'], args: { line: cmd } });
         }
         return this.endPacket();
     }
