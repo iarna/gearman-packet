@@ -2,3 +2,5 @@ node_modules
 *~
 .#*
 DEADJOE
+.nyc_output
+coverage
