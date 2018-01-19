@@ -29,5 +29,12 @@
   },
   "directories": {
     "test": "test"
-  }
+  },
+  "files": [
+    "PROTOCOL.md",
+    "gearman-packet.js",
+    "packet-emitter.js",
+    "packet-parser.js",
+    "packet-types.js"
+  ]
 }
